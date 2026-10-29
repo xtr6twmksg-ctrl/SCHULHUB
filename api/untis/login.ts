@@ -1,12 +1,13 @@
 import { cookieHeader, error, isSameOrigin, json } from '../_lib/http.js'
-import { SESSION_COOKIE, SESSION_MAX_AGE, hasSessionSecret, sealSession } from '../_lib/session.js'
+import { REMEMBER_MAX_AGE, SESSION_COOKIE, SESSION_MAX_AGE, hasSessionSecret, sealSession } from '../_lib/session.js'
 import { UNTIS_BAD_CREDENTIALS, UntisError, authenticate, untisConfig } from '../_lib/untis.js'
 
 /**
  * Anmeldung bei WebUntis.
- * Benutzername und Passwort werden nur an WebUntis weitergereicht und weder
- * gespeichert noch protokolliert. Zurück kommt ein verschlüsseltes Cookie mit
- * der WebUntis-Sitzungskennung.
+ * Benutzername und Passwort werden an WebUntis weitergereicht und nie
+ * protokolliert. Zurück kommt ein verschlüsseltes Cookie mit der
+ * WebUntis-Sitzungskennung – bei "Angemeldet bleiben" zusätzlich mit den
+ * verschlüsselten Zugangsdaten für die automatische Neuanmeldung.
  */
 export async function POST(request: Request): Promise<Response> {
   if (!isSameOrigin(request)) return error('Ungültige Herkunft der Anfrage.', 403)
@@ -14,7 +15,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!cfg) return error('WebUntis ist auf diesem Server noch nicht eingerichtet.', 503, 'not_configured')
   if (!hasSessionSecret()) return error('SESSION_SECRET fehlt auf dem Server.', 503, 'not_configured')
 
-  let body: { username?: unknown; password?: unknown }
+  let body: { username?: unknown; password?: unknown; remember?: unknown }
   try {
     body = await request.json()
   } catch {
@@ -26,6 +27,9 @@ export async function POST(request: Request): Promise<Response> {
     return error('Bitte Benutzername und Passwort eingeben.', 400)
   }
 
+  const remember = body.remember === true
+  const maxAge = remember ? REMEMBER_MAX_AGE : SESSION_MAX_AGE
+
   try {
     const auth = await authenticate(cfg, username, password)
     const token = sealSession({
@@ -33,13 +37,10 @@ export async function POST(request: Request): Promise<Response> {
       personId: auth.personId,
       personType: auth.personType,
       klasseId: auth.klasseId,
-      exp: Date.now() + SESSION_MAX_AGE * 1000,
+      exp: Date.now() + maxAge * 1000,
+      ...(remember ? { cred: { u: username, p: password } } : {}),
     })
-    return json(
-      { ok: true },
-      200,
-      { 'set-cookie': cookieHeader(request, SESSION_COOKIE, token, SESSION_MAX_AGE) },
-    )
+    return json({ ok: true }, 200, { 'set-cookie': cookieHeader(request, SESSION_COOKIE, token, maxAge) })
   } catch (err) {
     if (err instanceof UntisError) {
       if (err.code === UNTIS_BAD_CREDENTIALS) return error('Benutzername oder Passwort ist falsch.', 401, 'bad_credentials')

@@ -22,7 +22,7 @@ export function More() {
           {config?.untis.loggedIn ? (
             <div className="space-y-3">
               <p className="text-sm text-ink">
-                Verbunden{config.untis.school ? ` mit „${config.untis.school}“` : ''}. Die Anmeldung läuft nach spätestens 8 Stunden ab.
+                Verbunden{config.untis.school ? ` mit „${config.untis.school}“` : ''}. Mit „Abmelden“ werden auch gespeicherte Zugangsdaten von diesem Gerät gelöscht.
               </p>
               <Button variant="secondary" icon={LogOut} onClick={logout}>
                 Abmelden
@@ -64,8 +64,11 @@ export function More() {
         <Card title="Datenschutz" icon={Database} delay={180}>
           <ul className="space-y-2 text-sm leading-relaxed">
             <li>Kein Benutzerkonto, keine Werbung, kein Tracking, keine Cookies außer der WebUntis-Anmeldung.</li>
-            <li>Dein WebUntis-Passwort wird nur zur Anmeldung an WebUntis weitergeleitet und nicht gespeichert.</li>
-            <li>Gespeichert wird nur ein verschlüsseltes Sitzungs-Cookie (max. 8 Stunden) und deine Favoriten auf diesem Gerät.</li>
+            <li>Dein WebUntis-Passwort wird nur an WebUntis weitergeleitet. Auf dem Server wird nichts gespeichert.</li>
+            <li>
+              Auf diesem Gerät liegt ein verschlüsseltes Cookie: ohne „Angemeldet bleiben“ max. 8 Stunden nur mit der Sitzung, mit
+              „Angemeldet bleiben“ max. 90 Tage inkl. verschlüsselter Zugangsdaten. Dazu deine Favoriten.
+            </li>
             <li>Haltestellen-Anfragen gehen ohne persönliche Daten an Transitous.</li>
           </ul>
         </Card>

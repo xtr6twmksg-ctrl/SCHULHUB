@@ -173,8 +173,11 @@ Jede Änderung, die du später zu GitHub hochlädst, veröffentlicht Vercel auto
 ## 8. Datenschutz & Sicherheit
 
 **Was verarbeitet wird**
-- **WebUntis-Login:** Benutzername und Passwort gehen per HTTPS an die Funktion `/api/untis/login` und von dort direkt an WebUntis. Sie werden **nicht gespeichert und nicht protokolliert**.
-- **Sitzung:** Gespeichert wird nur ein **verschlüsseltes** Cookie (`HttpOnly`, `Secure`, `SameSite=Strict`, max. 8 Stunden) mit der WebUntis-Sitzungskennung und deiner Personen-ID. Ohne `SESSION_SECRET` ist es unlesbar.
+- **WebUntis-Login:** Benutzername und Passwort gehen per HTTPS an die Funktion `/api/untis/login` und von dort direkt an WebUntis. Sie werden **nie protokolliert** und **nicht auf dem Server gespeichert**.
+- **Sitzung:** Auf deinem Gerät liegt ein **verschlüsseltes** Cookie (`HttpOnly`, `Secure`, `SameSite=Strict`), das ohne `SESSION_SECRET` unlesbar ist und das JavaScript nicht auslesen kann:
+  - **ohne „Angemeldet bleiben“:** max. 8 Stunden, nur WebUntis-Sitzungskennung und Personen-ID.
+  - **mit „Angemeldet bleiben“ (Standard):** max. 90 Tage, zusätzlich **verschlüsselt** Benutzername und Passwort. Damit meldet sich der Server automatisch neu bei WebUntis an, wenn dessen Sitzung abläuft. „Abmelden“ löscht das Cookie sofort. Auf fremden oder geteilten Geräten das Häkchen weglassen.
+  - Wird `SESSION_SECRET` geändert, sind alle gespeicherten Anmeldungen sofort ungültig (Notfall-Schalter).
 - **Stundenplan:** wird nur durchgereicht und **nirgends gespeichert**. Auch der Service Worker speichert keine API-Antworten.
 - **Favoriten-Haltestellen:** nur im Browser deines Geräts (localStorage).
 - **Fahrplan-Anfragen:** Haltestellen-IDs und Suchtext gehen an Transitous, **ohne** persönliche Daten.
@@ -204,7 +207,8 @@ Jede Änderung, die du später zu GitHub hochlädst, veröffentlicht Vercel auto
 
 ## 10. Bekannte Grenzen
 
-- Die WebUntis-Sitzung läuft nach spätestens 8 Stunden ab (oder früher, wenn WebUntis sie beendet). Dann einfach neu anmelden.
+- Mit „Angemeldet bleiben“ hält die Anmeldung bis zu 90 Tage, ohne das Häkchen bis zu 8 Stunden. Änderst du dein WebUntis-Passwort, musst du dich neu anmelden.
+- Auf dem iPhone haben Safari und die Homescreen-App getrennte Speicher: Melde dich in der Homescreen-App einmal selbst an.
 - Die Haltestellensuche nutzt einen deutschlandweiten Suchdienst. Manche Ortsteil-Namen (z. B. „Volkmarode“) findet man besser über eine konkrete Haltestelle wie „Moorhüttenweg“ oder „Seikenkamp“.
 - Transitous ist ein ehrenamtlicher Dienst ohne Garantie. Fällt er aus, zeigt die App eine Fehlermeldung mit „Erneut versuchen“.
 - Echtzeit gibt es nur, wo die Verkehrsunternehmen Echtzeitdaten offen bereitstellen.

@@ -52,6 +52,7 @@ export function UntisLogin() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow] = useState(false)
+  const [remember, setRemember] = useState(true)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
@@ -68,7 +69,7 @@ export function UntisLogin() {
     setBusy(true)
     setErr(null)
     try {
-      await postJSON('/api/untis/login', { username, password })
+      await postJSON('/api/untis/login', { username, password, remember })
       setPassword('')
       await reloadConfig()
     } catch (error) {
@@ -114,13 +115,24 @@ export function UntisLogin() {
           {show ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
+      <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-2xl bg-white/55 px-4 text-sm font-medium">
+        <input
+          type="checkbox"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="size-5 accent-navy-800"
+        />
+        Angemeldet bleiben
+      </label>
       {err && <Notice tone="error">{err}</Notice>}
       <Button type="submit" icon={LogIn} disabled={busy || !username || !password} className="w-full">
         {busy ? 'Anmelden …' : 'Mit WebUntis verbinden'}
       </Button>
       <p className="flex gap-2 text-xs leading-relaxed text-muted">
         <ShieldCheck size={16} className="shrink-0 text-emerald-700" aria-hidden />
-        Dein Passwort wird verschlüsselt (HTTPS) nur an WebUntis weitergegeben und nirgends gespeichert. Die Anmeldung gilt bis zu 8 Stunden.
+        {remember
+          ? 'Deine Zugangsdaten werden verschlüsselt nur auf diesem Gerät (in einem geschützten Cookie) gespeichert, damit du bis zu 90 Tage angemeldet bleibst. Nicht auf fremden Geräten verwenden.'
+          : 'Dein Passwort wird nur an WebUntis weitergegeben und nirgends gespeichert. Die Anmeldung gilt bis zu 8 Stunden.'}
       </p>
     </form>
   )
