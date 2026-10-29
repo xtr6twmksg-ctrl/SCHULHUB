@@ -1,0 +1,105 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --color-navy-950: #071530;
+  --color-navy-900: #0b1f44;
+  --color-navy-800: #12306a;
+  --color-navy-700: #1b4192;
+  --color-navy-600: #2553b8;
+  --color-navy-100: #e3eaf8;
+  --color-navy-50: #f1f5fc;
+  --color-ink: #0f172a;
+  --color-muted: #55617a;
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+:root {
+  color-scheme: light;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background: #eef2f9;
+}
+
+body {
+  @apply font-sans text-ink antialiased;
+  min-height: 100dvh;
+  background:
+    radial-gradient(60rem 40rem at 10% -10%, #dbe6ff 0%, transparent 60%),
+    radial-gradient(50rem 40rem at 110% 10%, #e9e1ff 0%, transparent 55%),
+    radial-gradient(60rem 50rem at 50% 120%, #d9f0ff 0%, transparent 60%),
+    #f4f6fb;
+  background-attachment: fixed;
+}
+
+/* Liquid-Glass-Fläche */
+@utility glass {
+  background: rgb(255 255 255 / 0.62);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 0.75);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 10px 30px -12px rgb(15 30 70 / 0.18),
+    0 2px 6px -2px rgb(15 30 70 / 0.08);
+}
+
+@utility glass-strong {
+  background: rgb(255 255 255 / 0.78);
+  backdrop-filter: blur(30px) saturate(190%);
+  -webkit-backdrop-filter: blur(30px) saturate(190%);
+  border: 1px solid rgb(255 255 255 / 0.85);
+  box-shadow: 0 12px 40px -12px rgb(15 30 70 / 0.25);
+}
+
+@utility pb-safe {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@utility pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top));
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-rise {
+  animation: rise 0.45s var(--ease-ios) both;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@utility skeleton {
+  background: linear-gradient(90deg, rgb(15 30 70 / 0.06) 25%, rgb(15 30 70 / 0.11) 37%, rgb(15 30 70 / 0.06) 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 0.6rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-navy-600);
+  outline-offset: 2px;
+}
